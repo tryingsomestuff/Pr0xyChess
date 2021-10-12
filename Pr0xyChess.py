@@ -124,47 +124,52 @@ def uci():
 
     currentName = list(procs)[(currentId//nmoves_per_engine)%len(engines)]
 
-    while True:
-        displ('info string current engine is {}'.format(currentName))
-        t = input()
+    try:
 
-        if t == 'quit':
-            # quit all engines
-            for engine in engines:
-                procs[engine].uci_quit()            
-            break
+        while True:
+            displ('info string current engine is {}'.format(currentName))
+            t = input()
 
-        elif t == 'uci': 
-            displ('id name Pr0xy\nid author xr_a_y\n')
-            # init all engine
-            for engine in engines:
-                procs[engine].uci_uci()
-            displ('uciok')
+            if t == 'quit':
+                # quit all engines
+                for engine in engines:
+                    procs[engine].uci_quit()
+                break
 
-        elif t == 'isready': 
-            # broadcast to each engine
-            for engine in engines:
-                procs[engine].uci_isready()
-            displ('readyok')
+            elif t == 'uci': 
+                displ('id name Pr0xy\nid author xr_a_y\n')
+                # init all engine
+                for engine in engines:
+                    procs[engine].uci_uci()
+                displ('uciok')
 
-        elif t == 'ucinewgame': 
-            # broadcast to each engine
-            for engine in engines:
-                procs[engine].uci_ucinewgame()
+            elif t == 'isready': 
+                # broadcast to each engine
+                for engine in engines:
+                    procs[engine].uci_isready()
+                displ('readyok')
 
-        elif t.startswith('setoption'):
-            # broadcast to each engine
-            for engine in engines:
-                procs[engine].uci_set_option(t + '\n')
+            elif t == 'ucinewgame': 
+                # broadcast to each engine
+                for engine in engines:
+                    procs[engine].uci_ucinewgame()
 
-        elif t.startswith('go'):
-            # this is an async call !
-            procs[currentName].uci_search(t + '\n')
+            elif t.startswith('setoption'):
+                # broadcast to each engine
+                for engine in engines:
+                    procs[engine].uci_set_option(t + '\n')
 
-        else:
-            # only send to current engine
-            procs[currentName].writeline(t + '\n')
+            elif t.startswith('go'):
+                # this is an async call !
+                procs[currentName].uci_search(t + '\n')
 
+            else:
+                # only send to current engine
+                procs[currentName].writeline(t + '\n')
+
+    except:
+        for engine in engines:
+            procs[engine].uci_quit()
 
 if __name__ == '__main__':
     uci()
