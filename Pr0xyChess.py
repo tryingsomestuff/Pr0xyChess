@@ -121,7 +121,7 @@ def uci():
 
     while True:
         # change engine every 5 played moves
-        currentName = list(procs)[currentId//5]
+        currentName = list(procs)[(currentId//5)%len(engines)]
         current = procs[currentName]        
         displ('info string current engine is {}'.format(currentName))
         t = input()
