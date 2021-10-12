@@ -27,6 +27,7 @@ currentId = 0
 currentName = ""
 engines = []
 procs = {}
+nmoves_per_engine = 5
 
 class Engine():
 
@@ -86,10 +87,10 @@ class Engine():
 
     def search_callback(self, *args):
         # access the global
-        global currentId, currentName, procs, engines
+        global currentId, currentName, procs, engines, nmoves_per_engine
         # change engine every 5 played moves
         currentId += 1
-        currentName = list(procs)[(currentId//5)%len(engines)]
+        currentName = list(procs)[(currentId//nmoves_per_engine)%len(engines)]
         self.searching = False
         
     @run_async(search_callback)
@@ -106,13 +107,15 @@ class Engine():
 
 parser = argparse.ArgumentParser(description='Multiple engine proxy')
 parser.add_argument('-e', '--engines', type=str, nargs='+', help='a list of engines to check')
+parser.add_argument('-n', '--moves', type=int, default=5, help='number of consecutive moves for each engine, between 1 and 40')
 args = parser.parse_args()
 
 engines = args.engines
+nmoves_per_engine = max(1,min(args.moves,40))
 if not engines or engines and len(engines) == 0:
     parser.error('At least one engine needs to be specified')
 
-print('info string {}'.format(engines))
+print('info string {}. Using {} moves per engine'.format(engines,nmoves_per_engine))
 
 def uci():
     # access the global
@@ -122,7 +125,7 @@ def uci():
     for engine in engines:
         procs[engine] = Engine(engine,False)
 
-    currentName = list(procs)[(currentId//5)%len(engines)]
+    currentName = list(procs)[(currentId//nmoves_per_engine)%len(engines)]
 
     while True:
         displ('info string current engine is {}'.format(currentName))
