@@ -1,9 +1,6 @@
 from subprocess import Popen, PIPE, STDOUT
-import multiprocessing
 import os,sys
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
 import asyncio
 
 #taken from https://stackoverflow.com/questions/55003789/python-call-callback-after-async-function-is-done
