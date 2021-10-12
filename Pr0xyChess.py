@@ -22,8 +22,11 @@ def run_async(callback):
 def displ(l): 
     print(l, flush=True)
 
-# global variable for current engine index
+# global variable for current engine index, name and list of engines, and dict of forked processus
 currentId = 0
+currentName = ""
+engines = []
+procs = {}
 
 class Engine():
 
@@ -83,9 +86,10 @@ class Engine():
 
     def search_callback(self, *args):
         # access the global
-        global currentId        
+        global currentId, currentName, procs, engines
+        # change engine every 5 played moves
         currentId += 1
-
+        currentName = list(procs)[(currentId//5)%len(engines)]
         self.searching = False
         
     @run_async(search_callback)
@@ -112,17 +116,15 @@ print('info string {}'.format(engines))
 
 def uci():
     # access the global
-    global currentId
+    global currentId, currentName
 
     # create each engine processe
-    procs = {}
     for engine in engines:
         procs[engine] = Engine(engine,False)
 
+    currentName = list(procs)[(currentId//5)%len(engines)]
+
     while True:
-        # change engine every 5 played moves
-        currentName = list(procs)[(currentId//5)%len(engines)]
-        current = procs[currentName]        
         displ('info string current engine is {}'.format(currentName))
         t = input()
 
@@ -157,11 +159,11 @@ def uci():
 
         elif t.startswith('go'):
             # this is an async call !
-            current.uci_search(t + '\n')
+            procs[currentName].uci_search(t + '\n')
 
         else:
             # only send to current engine
-            current.writeline(t + '\n')
+            procs[currentName].writeline(t + '\n')
 
 
 if __name__ == '__main__':
